@@ -1,0 +1,16 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Topic _$TopicFromJson(Map<String, dynamic> json) => Topic(
+  topicId: json['topicId'] as String,
+  title: json['title'] as String,
+  totalQuestionsAvailable:
+      (json['totalQuestionsAvailable'] as num?)?.toInt() ?? 0,
+);
+
+Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
+  'topicId': instance.topicId,
+  'title': instance.title,
+  'totalQuestionsAvailable': instance.totalQuestionsAvailable,
+};
