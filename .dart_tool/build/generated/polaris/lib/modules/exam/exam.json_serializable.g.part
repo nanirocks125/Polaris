@@ -1,0 +1,30 @@
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Exam _$ExamFromJson(Map<String, dynamic> json) => Exam(
+  id: json['id'] as String? ?? '',
+  title: json['title'] as String,
+  description: json['description'] as String? ?? '',
+  targetDate: const TimestampConverter().fromJson(
+    json['targetDate'] as Timestamp,
+  ),
+  phases:
+      (json['phases'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
+  isActive: json['isActive'] as bool? ?? false,
+  targetRecallPercentage:
+      (json['targetRecallPercentage'] as num?)?.toInt() ?? 70,
+  themeColorHex: json['themeColorHex'] as String? ?? '#2196F3',
+);
+
+Map<String, dynamic> _$ExamToJson(Exam instance) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'description': instance.description,
+  'targetDate': const TimestampConverter().toJson(instance.targetDate),
+  'phases': instance.phases,
+  'isActive': instance.isActive,
+  'targetRecallPercentage': instance.targetRecallPercentage,
+  'themeColorHex': instance.themeColorHex,
+};

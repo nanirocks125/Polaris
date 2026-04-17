@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:polaris/modules/authentication/login_screen.dart';
+import 'package:polaris/app_router.dart';
+import 'package:polaris/service/theme_service.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -9,6 +10,8 @@ void main() async {
 
   // Initialize Firebase for Web
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
 
   runApp(const RecallApp());
 }
@@ -18,49 +21,19 @@ class RecallApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: 'Group 1 Recall', home: AuthGate());
-  }
-}
+    // 1. Wrap with ListenableBuilder to "listen" to the themeService
+    return ListenableBuilder(
+      listenable: themeService,
+      builder: (context, _) {
+        return MaterialApp.router(
+          title: 'Group 1 Recall',
+          // 2. This will now reactively update whenever toggleTheme is called
+          themeMode: themeService.themeMode,
 
-// The new dynamic AuthGate
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+          theme: ThemeData.light(useMaterial3: true),
+          darkTheme: ThemeData.dark(useMaterial3: true),
 
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        // STATE: Waiting for Firebase to initialize the stream
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        // STATE: User is NOT logged in
-        if (!snapshot.hasData) {
-          return const LoginScreen();
-        }
-
-        // STATE: User IS logged in
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Dashboard'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () => FirebaseAuth.instance.signOut(),
-              ),
-            ],
-          ),
-          body: Center(
-            child: Text(
-              'Dashboard Ready.\nLogged in as: ${snapshot.data?.email}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
+          routerConfig: appRouter,
         );
       },
     );
