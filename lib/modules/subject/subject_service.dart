@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:polaris/modules/subject/subject.dart';
+import 'package:polaris/modules/subject/model/subject.dart';
 
 class SubjectService {
   final CollectionReference<Map<String, dynamic>> _subjectsRef =

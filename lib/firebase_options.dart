@@ -21,10 +21,7 @@ class DefaultFirebaseOptions {
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for android - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return android;
       case TargetPlatform.iOS:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for ios - '
@@ -60,4 +57,13 @@ class DefaultFirebaseOptions {
     authDomain: 'polarir-g1.firebaseapp.com',
     storageBucket: 'polarir-g1.firebasestorage.app',
   );
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyC3mFz6WnShJD75__FPsD2Xsv8Brg8Zaq8',
+    appId: '1:28625374823:android:a12ca5f645ec97a4178ec2',
+    messagingSenderId: '28625374823',
+    projectId: 'polarir-g1',
+    storageBucket: 'polarir-g1.firebasestorage.app',
+  );
+
 }

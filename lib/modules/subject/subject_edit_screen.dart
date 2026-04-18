@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:polaris/modules/subject/subject.dart';
+import 'package:polaris/modules/subject/model/subject.dart';
 import 'package:polaris/modules/subject/subject_service.dart';
 
 class SubjectEditScreen extends StatefulWidget {

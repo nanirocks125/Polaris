@@ -20,6 +20,12 @@ Topic _$TopicFromJson(Map<String, dynamic> json) => Topic(
     json['nextReviewDate'],
     const TimestampConverter().fromJson,
   ),
+  subject: json['subject'] == null
+      ? null
+      : SubjectSnapshot.fromJson(json['subject'] as Map<String, dynamic>),
+  module: json['module'] == null
+      ? null
+      : ModuleSnapshot.fromJson(json['module'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
@@ -28,6 +34,8 @@ Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
   'description': instance.description,
   'easeFactor': instance.easeFactor,
   'interval': instance.interval,
+  'subject': instance.subject,
+  'module': instance.module,
   'lastReviewedAt': _$JsonConverterToJson<Timestamp, DateTime>(
     instance.lastReviewedAt,
     const TimestampConverter().toJson,

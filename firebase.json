@@ -1,1 +1,1 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"polarir-g1","configurations":{"web":"1:28625374823:web:9a7b41591f012b9f178ec2"}}}}}}
+{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"polarir-g1","configurations":{"android":"1:28625374823:android:a12ca5f645ec97a4178ec2","web":"1:28625374823:web:9a7b41591f012b9f178ec2"}}},"android":{"default":{"projectId":"polarir-g1","appId":"1:28625374823:android:a12ca5f645ec97a4178ec2","fileOutput":"android/app/google-services.json"}}}}}

@@ -1,22 +1,33 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:polaris/modules/subject/subject_snapshot.dart';
+import 'package:polaris/modules/topic/topic_snapshot.dart';
 
 part 'module.g.dart';
 
 @JsonSerializable()
 class Module {
-  @JsonKey(includeFromJson: false, includeToJson: false)
   String id;
 
   String title;
   String description;
   int priority; // To keep "Basics" before "Advanced"
 
+  int totalTopicsCount;
+  int completedTopicsCount;
+
+  final List<TopicSnapshot> topics; // Instant access to chapter list
+  SubjectSnapshot? subject;
+
   Module({
     this.id = '',
     required this.title,
     required this.description,
     this.priority = 0,
+    this.totalTopicsCount = 0,
+    this.completedTopicsCount = 0,
+    this.topics = const [],
+    this.subject,
   });
 
   factory Module.fromJson(Map<String, dynamic> json) => _$ModuleFromJson(json);

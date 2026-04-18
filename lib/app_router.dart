@@ -12,7 +12,7 @@ import 'package:polaris/modules/module/module.dart';
 import 'package:polaris/modules/module/module_details_screen.dart';
 import 'package:polaris/modules/module/module_edit_screen.dart';
 import 'package:polaris/modules/module/module_list_screen.dart';
-import 'package:polaris/modules/subject/subject.dart';
+import 'package:polaris/modules/subject/model/subject.dart';
 import 'package:polaris/modules/subject/subject_details_screen.dart';
 import 'package:polaris/modules/subject/subject_edit_screen.dart';
 import 'package:polaris/modules/subject/subject_list_screen.dart';

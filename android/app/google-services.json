@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "28625374823",
+    "project_id": "polarir-g1",
+    "storage_bucket": "polarir-g1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28625374823:android:4cfbd74fd964e33c178ec2",
+        "android_client_info": {
+          "package_name": "com.example.polaris"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3mFz6WnShJD75__FPsD2Xsv8Brg8Zaq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:28625374823:android:a12ca5f645ec97a4178ec2",
+        "android_client_info": {
+          "package_name": "com.polarisg1.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3mFz6WnShJD75__FPsD2Xsv8Brg8Zaq8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
