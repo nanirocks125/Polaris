@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:polaris/modules/exam/exam_snapshot.dart';
+import 'package:polaris/modules/user/app_user_service.dart';
 import 'package:polaris/provider/app_user_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -70,16 +72,50 @@ class UserDetailsScreen extends StatelessWidget {
             const Divider(height: 40),
             // App State Section
             _buildSectionHeader(context, 'Current Focus'),
-            ListTile(
-              leading: const Icon(Icons.assignment_turned_in_outlined),
-              title: const Text('Active Exam ID'),
-              subtitle: Text(
-                user.activeExam?.title ?? 'No active exam selected',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.withOpacity(0.2)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.assignment_turned_in_outlined,
+                      color: Colors.blueAccent,
+                    ),
+                    title: const Text('Active Exam'),
+                    subtitle: user.assignedExams.isEmpty
+                        ? const Text('No exams assigned yet')
+                        : DropdownButtonHideUnderline(
+                            child: DropdownButton<ExamSnapshot>(
+                              isExpanded: true,
+                              value: user.activeExam,
+                              hint: const Text('Select an Exam'),
+                              // 1. Generate items from assigned snapshots
+                              items: user.assignedExams.map((snapshot) {
+                                return DropdownMenuItem<ExamSnapshot>(
+                                  value: snapshot,
+                                  child: Text(snapshot.title),
+                                );
+                              }).toList(),
+                              // 2. Switch logic
+                              onChanged: (ExamSnapshot? selectedExam) async {
+                                if (selectedExam != null) {
+                                  await AppUserService(
+                                    uid: user.id,
+                                  ).switchActiveExam(selectedExam);
+                                  // Provider will automatically notify and update the UI
+                                }
+                              },
+                            ),
+                          ),
+                  ),
+                ),
               ),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                /* Navigate to Exam Switcher */
-              },
             ),
             // Settings Section
             _buildSectionHeader(context, 'Settings'),

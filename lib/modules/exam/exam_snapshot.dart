@@ -17,6 +17,16 @@ class ExamSnapshot {
     this.progress = 0.0,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExamSnapshot &&
+          runtimeType == other.runtimeType &&
+          id == other.id; // Compare IDs instead of instances
+
+  @override
+  int get hashCode => id.hashCode;
+
   factory ExamSnapshot.fromJson(Map<String, dynamic> json) =>
       _$ExamSnapshotFromJson(json);
   Map<String, dynamic> toJson() => _$ExamSnapshotToJson(this);

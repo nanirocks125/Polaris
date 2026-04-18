@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:polaris/modules/exam/exam.dart';
+import 'package:polaris/modules/exam/exam_snapshot.dart';
 import 'package:polaris/modules/user/app_user.dart';
 import 'package:polaris/modules/user/app_user_settings.dart';
 
@@ -21,11 +23,6 @@ class AppUserService {
 
   // --- Actions ---
 
-  // switching the current exam context
-  Future<void> switchActiveExam(String examId) async {
-    await _userRef.update({'activeExamId': examId});
-  }
-
   // Update specific settings without rewriting the whole user doc
   Future<void> updateSettings(AppUserSettings settings) async {
     await _userRef.update({'settings': settings.toJson()});
@@ -37,5 +34,42 @@ class AppUserService {
     if (name != null) data['name'] = name;
     if (email != null) data['email'] = email;
     await _userRef.update(data);
+  }
+
+  // Fetch all users for the Admin list
+  Stream<List<AppUser>> getAllUsersStream() {
+    return _db
+        .collection('users')
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => AppUser.fromJson(doc.data())..id = doc.id)
+              .toList(),
+        );
+  }
+
+  // Assign an exam to a specific user
+  Future<void> assignExamToUser(String userId, Exam exam) async {
+    // 1. Create the Snapshot
+    final snapshot = ExamSnapshot(
+      id: exam.id,
+      title: exam.title,
+      themeColorHex: exam.themeColorHex,
+      progress: 0.0, // New assignment starts at 0
+    );
+
+    // 2. Update user document
+    await _db.collection('users').doc(userId).update({
+      'assignedExams': FieldValue.arrayUnion([snapshot.toJson()]),
+      // Automatically set as active if it's their first exam
+      'activeExam': snapshot.toJson(),
+    });
+  }
+
+  // Inside UserService
+  Future<void> switchActiveExam(ExamSnapshot exam) async {
+    await _userRef.update({
+      'activeExam': exam.toJson(), // Entire snapshot updated for instant access
+    });
   }
 }

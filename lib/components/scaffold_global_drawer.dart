@@ -48,6 +48,14 @@ class ScaffoldGlobalDrawer extends StatelessWidget {
                   if (user.isAdmin) ...[
                     ListTile(
                       leading: const Icon(Icons.assignment_outlined),
+                      title: const Text('Users'),
+                      onTap: () {
+                        context.pop(); // Close drawer
+                        context.go('/users');
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.assignment_outlined),
                       title: const Text('Exams'),
                       onTap: () {
                         context.pop(); // Close drawer

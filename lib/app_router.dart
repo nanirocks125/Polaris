@@ -22,6 +22,7 @@ import 'package:polaris/modules/topic/topic_edit_screen.dart';
 import 'package:polaris/modules/topic/topic_list_screen.dart';
 import 'package:polaris/modules/user/user_details_edit_screen.dart';
 import 'package:polaris/modules/user/user_details_screen.dart';
+import 'package:polaris/modules/user/user_management_screen.dart';
 import 'modules/authentication/login_screen.dart';
 
 // 1. A helper class that tells the router to refresh whenever Firebase Auth changes
@@ -95,6 +96,10 @@ final GoRouter appRouter = GoRouter(
               builder: (context, state) => const UserEditScreen(),
             ),
           ],
+        ),
+        GoRoute(
+          path: '/users',
+          builder: (context, state) => const UserManagementScreen(),
         ),
 
         GoRoute(
