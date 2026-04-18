@@ -7,6 +7,7 @@ part of 'module.dart';
 // **************************************************************************
 
 Module _$ModuleFromJson(Map<String, dynamic> json) => Module(
+  id: json['id'] as String? ?? '',
   title: json['title'] as String,
   description: json['description'] as String,
   priority: (json['priority'] as num?)?.toInt() ?? 0,
@@ -23,6 +24,7 @@ Module _$ModuleFromJson(Map<String, dynamic> json) => Module(
 );
 
 Map<String, dynamic> _$ModuleToJson(Module instance) => <String, dynamic>{
+  'id': instance.id,
   'title': instance.title,
   'description': instance.description,
   'priority': instance.priority,
