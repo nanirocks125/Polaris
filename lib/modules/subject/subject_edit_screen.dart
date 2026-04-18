@@ -105,12 +105,55 @@ class _SubjectEditScreenState extends State<SubjectEditScreen> {
                   m.title,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
-                trailing: const Icon(Icons.link, size: 16, color: Colors.grey),
+                // --- ADDED UNLINK ACTION ---
+                trailing: IconButton(
+                  icon: const Icon(
+                    Icons.link_off,
+                    color: Colors.redAccent,
+                    size: 20,
+                  ),
+                  tooltip: "Unlink Module",
+                  onPressed: () => _handleUnlink(m),
+                ),
               ),
             ),
         ],
       ),
     );
+  }
+
+  // Add this helper method to handle the logic:
+  void _handleUnlink(ModuleSnapshot module) async {
+    // 1. Confirm with the user
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Unlink Module?"),
+        content: Text(
+          "Do you want to unlink '${module.title}' from this subject?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("Unlink", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      // 2. Perform atomic update in DB
+      await _subjectService.unlinkModuleFromSubject(widget.subject, module);
+
+      // 3. Update local state to reflect change immediately
+      setState(() {
+        _currentModules.removeWhere((item) => item.id == module.id);
+      });
+    }
   }
 
   Widget _buildModuleHeader() {

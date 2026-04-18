@@ -32,6 +32,6 @@ Map<String, dynamic> _$SubjectToJson(Subject instance) => <String, dynamic>{
   'completedModulesCount': instance.completedModulesCount,
   'totalTopicsCount': instance.totalTopicsCount,
   'completedTopicsCount': instance.completedTopicsCount,
-  'modules': instance.modules,
+  'modules': instance.modules.map((e) => e.toJson()).toList(),
   'isGeneralStudies': instance.isGeneralStudies,
 };

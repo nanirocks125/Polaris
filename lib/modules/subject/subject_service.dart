@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:polaris/modules/module/module.dart';
+import 'package:polaris/modules/module/module_snapshot.dart';
 import 'package:polaris/modules/subject/model/subject.dart';
 
 class SubjectService {
@@ -70,6 +71,28 @@ class SubjectService {
       transaction.update(subjectDoc, {
         'modules': FieldValue.arrayUnion([newModule.snapshot.toJson()]),
         'modulesCount': FieldValue.increment(1),
+      });
+    });
+  }
+
+  /// Atomically unlinks a Module from a Subject
+  Future<void> unlinkModuleFromSubject(
+    Subject subject,
+    ModuleSnapshot moduleSnapshot,
+  ) async {
+    final subjectDoc = _subjectsRef.doc(subject.id);
+    final moduleDoc = _modulesRef.doc(moduleSnapshot.id);
+
+    return _db.runTransaction((transaction) async {
+      // 1. Remove from Subject's modules array
+      transaction.update(subjectDoc, {
+        'modules': FieldValue.arrayRemove([moduleSnapshot.toJson()]),
+        'modulesCount': FieldValue.increment(-1),
+      });
+
+      // 2. Remove Subject reference from the Module document
+      transaction.update(moduleDoc, {
+        'subject': FieldValue.delete(), // Or set to null if using custom JSON
       });
     });
   }

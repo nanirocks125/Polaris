@@ -5,7 +5,7 @@ import 'package:polaris/modules/subject/model/subject_snapshot.dart';
 
 part 'subject.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true) // <--- Add this
 class Subject {
   String id;
 
