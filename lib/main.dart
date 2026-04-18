@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:polaris/app_router.dart';
+import 'package:polaris/provider/app_user_provider.dart';
 import 'package:polaris/service/theme_service.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -15,11 +17,19 @@ void main() async {
     await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
   }
 
-  runApp(const RecallApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppUserProvider()),
+        // Future providers like ExamProvider, ThemeProvider can go here
+      ],
+      child: const PolarisApp(),
+    ),
+  );
 }
 
-class RecallApp extends StatelessWidget {
-  const RecallApp({super.key});
+class PolarisApp extends StatelessWidget {
+  const PolarisApp({super.key});
 
   @override
   Widget build(BuildContext context) {

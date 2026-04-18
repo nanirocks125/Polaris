@@ -33,4 +33,8 @@ class AppUser {
   factory AppUser.fromJson(Map<String, dynamic> json) =>
       _$AppUserFromJson(json);
   Map<String, dynamic> toJson() => _$AppUserToJson(this);
+
+  bool get isAdmin {
+    return role == .admin;
+  }
 }
