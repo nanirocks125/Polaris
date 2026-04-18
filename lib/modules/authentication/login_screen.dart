@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    _emailController.text = 'nanirocks125@gmail.com';
+    _emailController.text = 'manikantanandam1996@gmail.com';
     _passwordController.text = 'Nandam@125';
   }
 

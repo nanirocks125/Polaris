@@ -17,6 +17,17 @@ class ExamService {
         );
   }
 
+  // Inside your ExamService class
+  Stream<Exam> getExamStream(String id) {
+    return _examsRef.doc(id).snapshots().map((doc) {
+      if (!doc.exists) {
+        throw Exception("Exam document not found for ID: $id");
+      }
+      // Using the fromFirestore factory we created earlier
+      return Exam.fromFirestore(doc);
+    });
+  }
+
   /// Creates a new exam and injects the auto-generated ID before saving
   Future<void> createExam(Exam exam) async {
     // 1. Generate a new document reference (this safely creates a unique ID locally)

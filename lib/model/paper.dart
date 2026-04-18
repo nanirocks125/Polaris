@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:polaris/modules/subject/subject_snapshot.dart';
 
 part 'paper.g.dart';
 
@@ -11,6 +12,8 @@ class Paper {
 
   String title; // e.g., "Paper-I: General Studies"
   String description;
+
+  final List<SubjectSnapshot> subjects;
 
   // Granular Exam Details
   int maxMarks; // e.g., 150
@@ -30,6 +33,7 @@ class Paper {
     this.totalSubjectsCount = 0,
     this.totalTopicsCount = 0,
     this.completedTopicsCount = 0,
+    this.subjects = const [],
   });
 
   // Boilerplate for json_serializable

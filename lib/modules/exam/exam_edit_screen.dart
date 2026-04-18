@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:polaris/enum/exam_phase.dart';
 import 'package:polaris/modules/exam/exam.dart';
 import 'package:polaris/modules/exam/exam_service.dart';
+import 'package:polaris/modules/exam/phase_details.dart'; // Import PhaseDetail
 
 class ExamEditScreen extends StatefulWidget {
   final Exam exam;
@@ -18,7 +19,12 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
   late TextEditingController _descController;
   late DateTime _selectedDate;
 
-  late List<ExamPhase> _phases;
+  late bool _isActive;
+  late double _targetRecall;
+  late TextEditingController _colorController;
+
+  // Changed from List<ExamPhase> to List<PhaseDetail>
+  late List<PhaseDetail> _phaseDetails;
   late Map<String, String> _resourceLinks;
 
   @override
@@ -27,7 +33,23 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
     _titleController = TextEditingController(text: widget.exam.title);
     _descController = TextEditingController(text: widget.exam.description);
     _selectedDate = widget.exam.targetDate;
-    _phases = List.from(widget.exam.phases);
+
+    // Deep copy the phases to avoid direct mutation of the widget property
+    _phaseDetails = widget.exam.phases
+        .map(
+          (p) => PhaseDetail(
+            phase: p.phase,
+            totalMarks: p.totalMarks,
+            previousCutoff: p.previousCutoff,
+            papers: List.from(p.papers),
+          ),
+        )
+        .toList();
+
+    _isActive = widget.exam.isActive;
+    _targetRecall = widget.exam.targetRecallPercentage.toDouble();
+    _colorController = TextEditingController(text: widget.exam.themeColorHex);
+
     _resourceLinks = Map.from(widget.exam.resourceLinks);
   }
 
@@ -39,11 +61,14 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
       title: _titleController.text.trim(),
       description: _descController.text.trim(),
       targetDate: _selectedDate,
-      phases: [],
+      phases:
+          _phaseDetails, // Correctly passing the list of PhaseDetail objects
       resourceLinks: _resourceLinks,
       isActive: widget.exam.isActive,
       targetRecallPercentage: widget.exam.targetRecallPercentage,
       themeColorHex: widget.exam.themeColorHex,
+      subjects: widget.exam.subjects, // Preserve subjects
+      lastStudiedAt: widget.exam.lastStudiedAt,
     );
 
     await _examService.updateExam(updatedExam);
@@ -52,9 +77,10 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine which phases are still available to be added
+    // Check which enum values are not yet represented in our _phaseDetails list
+    final usedPhases = _phaseDetails.map((p) => p.phase).toSet();
     final availablePhases = ExamPhase.values
-        .where((phase) => !_phases.contains(phase))
+        .where((phase) => !usedPhases.contains(phase))
         .toList();
 
     return Scaffold(
@@ -67,11 +93,58 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
       body: ListView(
         padding: const EdgeInsets.all(24.0),
         children: [
+          _buildSectionHeader('General Info'),
           TextField(
             controller: _titleController,
+            decoration: const InputDecoration(labelText: 'Exam Title'),
+          ),
+          const SizedBox(height: 16),
+
+          // Is Active & Recall Goal
+          SwitchListTile(
+            title: const Text("Set as Active Exam"),
+            subtitle: const Text(
+              "Determines if this appears on your dashboard",
+            ),
+            value: _isActive,
+            onChanged: (v) => setState(() => _isActive = v),
+          ),
+
+          _buildSectionHeader('Study Goals'),
+          Text("Target Recall: ${_targetRecall.toInt()}%"),
+          Slider(
+            value: _targetRecall,
+            min: 50,
+            max: 100,
+            divisions: 10,
+            label: "${_targetRecall.toInt()}%",
+            onChanged: (v) => setState(() => _targetRecall = v),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader('Appearance'),
+          TextField(
+            controller: _colorController,
             decoration: const InputDecoration(
-              labelText: 'Exam Title',
-              border: OutlineInputBorder(),
+              labelText: 'Theme Color Hex',
+              prefixText: '# ',
+              helperText: 'e.g. 2196F3',
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          _buildSectionHeader('Phases (Tap to edit marks)'),
+          ..._phaseDetails.map(
+            (pd) => ListTile(
+              title: Text(pd.phase.label),
+              subtitle: Text(
+                "${pd.totalMarks} Marks • ${pd.papers.length} Papers",
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.settings),
+                onPressed: () => _editPhaseSpecifics(pd),
+              ),
+              onTap: () => _editPhaseSpecifics(pd),
             ),
           ),
           const SizedBox(height: 16),
@@ -94,28 +167,19 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
               side: BorderSide(color: Colors.grey.shade800),
               borderRadius: BorderRadius.circular(4),
             ),
-            onTap: () async {
-              final picked = await showDatePicker(
-                context: context,
-                initialDate: _selectedDate,
-                firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                lastDate: DateTime.now().add(const Duration(days: 1825)),
-              );
-              if (picked != null) setState(() => _selectedDate = picked);
-            },
+            onTap: _selectDate,
           ),
 
           const SizedBox(height: 24),
 
-          // Phases Section with Dropdown Logic
           _buildSectionHeader('Exam Phases'),
           Wrap(
             spacing: 8,
-            children: _phases
+            children: _phaseDetails
                 .map(
                   (p) => InputChip(
-                    label: Text(p.label),
-                    onDeleted: () => setState(() => _phases.remove(p)),
+                    label: Text(p.phase.label),
+                    onDeleted: () => setState(() => _phaseDetails.remove(p)),
                     deleteIconColor: Colors.redAccent,
                   ),
                 )
@@ -137,7 +201,10 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
                 }).toList(),
                 onChanged: (ExamPhase? newValue) {
                   if (newValue != null) {
-                    setState(() => _phases.add(newValue));
+                    setState(() {
+                      // Wrap the enum in a PhaseDetail object
+                      _phaseDetails.add(PhaseDetail(phase: newValue));
+                    });
                   }
                 },
               ),
@@ -182,6 +249,16 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
     );
   }
 
+  Future<void> _selectDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 1825)),
+    );
+    if (picked != null) setState(() => _selectedDate = picked);
+  }
+
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -193,6 +270,53 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
           letterSpacing: 1.1,
           color: Colors.blueGrey,
         ),
+      ),
+    );
+  }
+
+  void _editPhaseSpecifics(PhaseDetail pd) {
+    final marksController = TextEditingController(
+      text: pd.totalMarks.toString(),
+    );
+    final cutoffController = TextEditingController(
+      text: pd.previousCutoff?.toString() ?? '',
+    );
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit ${pd.phase.label} Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: marksController,
+              decoration: const InputDecoration(labelText: 'Total Marks'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: cutoffController,
+              decoration: const InputDecoration(labelText: 'Previous Cutoff'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                pd.totalMarks = int.tryParse(marksController.text) ?? 0;
+                pd.previousCutoff = double.tryParse(cutoffController.text);
+              });
+              context.pop();
+            },
+            child: const Text('Update'),
+          ),
+        ],
       ),
     );
   }
@@ -209,9 +333,7 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
           children: [
             TextField(
               controller: keyController,
-              decoration: const InputDecoration(
-                hintText: 'Label (e.g. Confluence)',
-              ),
+              decoration: const InputDecoration(hintText: 'Label (e.g. Wiki)'),
             ),
             const SizedBox(height: 8),
             TextField(

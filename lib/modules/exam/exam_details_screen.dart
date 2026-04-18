@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:polaris/enum/exam_phase.dart';
 import 'package:polaris/modules/exam/exam.dart';
 import 'package:polaris/modules/exam/exam_service.dart';
+import 'package:polaris/modules/exam/phase_details.dart';
 
 class ExamDetailsScreen extends StatelessWidget {
   final Exam exam;
@@ -10,12 +11,11 @@ class ExamDetailsScreen extends StatelessWidget {
 
   ExamDetailsScreen({super.key, required this.exam});
 
-  // Helper to convert hex string to Color
   Color _getThemeColor() {
     try {
       return Color(int.parse(exam.themeColorHex.replaceFirst('#', '0xFF')));
     } catch (e) {
-      return Colors.blue; // Fallback
+      return Colors.blue;
     }
   }
 
@@ -38,7 +38,7 @@ class ExamDetailsScreen extends StatelessWidget {
               await _examService.deleteExam(exam.id);
               if (context.mounted) {
                 Navigator.pop(dialogContext);
-                context.pop(); // Return to Management Screen
+                context.pop();
               }
             },
             child: const Text('Delete', style: TextStyle(color: Colors.white)),
@@ -56,7 +56,6 @@ class ExamDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exam Overview'),
-        backgroundColor: Colors.transparent,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -69,111 +68,221 @@ class ExamDetailsScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Section: Title and Badge
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    exam.title,
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+        // padding: const EdgeInsets.all(24.0),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildStatusHeader(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      exam.title,
+                      style: Theme.of(context).textTheme.headlineMedium
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
-                ),
-                _buildCountdownBadge(daysRemaining, themeColor),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Description
-            Text(
-              exam.description.isEmpty
-                  ? "No description provided."
-                  : exam.description,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-
-            // Info Grid
-            Row(
-              children: [
-                _buildInfoTile(
+                  _buildCountdownBadge(daysRemaining, themeColor),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                exam.description.isEmpty
+                    ? "No description provided."
+                    : exam.description,
+                style: Theme.of(
                   context,
-                  "Target Date",
-                  exam.targetDate.toLocal().toString().split(' ')[0],
-                  Icons.event,
-                  themeColor,
-                ),
-                const SizedBox(width: 16),
-                _buildInfoTile(
-                  context,
-                  "Last Studied",
-                  exam.lastStudiedAt != null
-                      ? exam.lastStudiedAt!.toLocal().toString().split(' ')[0]
-                      : "Not yet",
-                  Icons.history,
-                  themeColor,
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
+                ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+              ),
+              const SizedBox(height: 32),
 
-            // Phases Section
-            _buildSectionLabel(context, "Phases"),
-
-            // const SizedBox(height: 12),
-            // Wrap(
-            //   spacing: 8,
-            //   runSpacing: 8,
-            //   children: exam.phases
-            //       .map(
-            //         (phase) => Chip(
-            //           label: Text(phase.label),
-            //           backgroundColor: themeColor.withOpacity(0.1),
-            //           side: BorderSide(color: themeColor.withOpacity(0.5)),
-            //         ),
-            //       )
-            //       .toList(),
-            // ),
-            // if (exam.phases.isEmpty) const Text("No phases defined."),
-            const SizedBox(height: 32),
-
-            // Resources Section
-            _buildSectionLabel(context, "Quick Links & Resources"),
-            const SizedBox(height: 12),
-            ...exam.resourceLinks.entries.map(
-              (entry) => Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: Icon(Icons.link, color: themeColor),
-                  title: Text(entry.key),
-                  subtitle: Text(
-                    entry.value,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  _buildInfoTile(
+                    context,
+                    "Target Date",
+                    exam.targetDate.toLocal().toString().split(' ')[0],
+                    Icons.event,
+                    themeColor,
                   ),
-                  trailing: const Icon(Icons.open_in_new, size: 18),
-                  onTap: () {
-                    // TODO: Use url_launcher to open entry.value
-                  },
+                  const SizedBox(width: 16),
+                  _buildInfoTile(
+                    context,
+                    "Recall Goal",
+                    "${exam.targetRecallPercentage}%",
+                    Icons.psychology_outlined,
+                    themeColor,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+
+              _buildInfoTile(
+                context,
+                "Status",
+                exam.isActive ? "ACTIVE" : "INACTIVE",
+                Icons.radio_button_checked,
+                exam.isActive ? Colors.green : Colors.grey,
+              ),
+
+              _buildSectionLabel(context, "Phases & Marks"),
+              const SizedBox(height: 12),
+              if (exam.phases.isEmpty)
+                const Text("No phases defined.")
+              else
+                ...exam.phases.map(
+                  (phase) => _buildPhaseCard(context, phase, themeColor),
+                ),
+
+              const SizedBox(height: 32),
+
+              _buildSectionLabel(context, "Quick Links & Resources"),
+              const SizedBox(height: 12),
+              ...exam.resourceLinks.entries.map(
+                (entry) => Card(
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListTile(
+                    leading: Icon(Icons.link, color: themeColor),
+                    title: Text(entry.key),
+                    subtitle: Text(
+                      entry.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: const Icon(Icons.open_in_new, size: 18),
+                    onTap: () {
+                      // url_launcher logic here
+                    },
+                  ),
+                ),
+              ),
+              if (exam.resourceLinks.isEmpty)
+                const Text("No resources linked."),
+
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/manage-subjects', extra: exam),
+                icon: const Icon(Icons.list_alt),
+                label: const Text("Manage Master Subject List"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- New UI Components for Model Updates ---
+
+  Widget _buildPhaseCard(
+    BuildContext context,
+    PhaseDetail detail,
+    Color themeColor,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: themeColor.withOpacity(0.2)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: themeColor.withOpacity(0.1),
+              child: Text(
+                detail.phase.label[0],
+                style: TextStyle(
+                  color: themeColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            if (exam.resourceLinks.isEmpty) const Text("No resources linked."),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    detail.phase.label,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    "${detail.papers.length} Papers • ${detail.totalMarks} Total Marks",
+                    style: const TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            if (detail.previousCutoff != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  const Text(
+                    "Prev. Cutoff",
+                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                  Text(
+                    detail.previousCutoff.toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: themeColor,
+                    ),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
     );
   }
 
-  // UI Components
+  Widget _buildStatusHeader() {
+    final bool active = exam.isActive;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: active
+            ? Colors.amber.withOpacity(0.1)
+            : Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(
+          color: active
+              ? Colors.amber.withOpacity(0.5)
+              : Colors.grey.withOpacity(0.5),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            active ? Icons.bolt : Icons.pause_circle_outline,
+            size: 14,
+            color: active ? Colors.amber : Colors.grey,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            active ? "ACTIVE EXAM" : "INACTIVE",
+            style: TextStyle(
+              color: active ? Colors.amber : Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontSize: 10,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSectionLabel(BuildContext context, String label) {
     return Text(
       label.toUpperCase(),
@@ -213,30 +322,25 @@ class ExamDetailsScreen extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: color),
+          const SizedBox(height: 12),
+          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }
