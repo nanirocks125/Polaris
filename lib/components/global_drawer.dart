@@ -39,10 +39,34 @@ class _GlobalDrawerState extends State<GlobalDrawer> {
           ),
           ListTile(
             leading: const Icon(Icons.assignment_outlined),
-            title: const Text('Exam Management'),
+            title: const Text('Exams'),
             onTap: () {
               context.pop(); // Close drawer
               context.go('/exams');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.assignment_outlined),
+            title: const Text('Subjects'),
+            onTap: () {
+              context.pop(); // Close drawer
+              context.go('/subjects');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.assignment_outlined),
+            title: const Text('Modules'),
+            onTap: () {
+              context.pop(); // Close drawer
+              context.go('/modules');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.assignment_outlined),
+            title: const Text('Topics'),
+            onTap: () {
+              context.pop(); // Close drawer
+              context.go('/topics');
             },
           ),
           const Spacer(),

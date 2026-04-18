@@ -112,31 +112,6 @@ class _ExamManagementScreenState extends State<ExamManagementScreen> {
     );
   }
 
-  // Deletion Confirmation
-  void _confirmDelete(Exam exam) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Exam?'),
-        content: Text('Are you sure you want to delete ${exam.title}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () async {
-              await _examService.deleteExam(exam.id);
-              if (context.mounted) Navigator.pop(context);
-            },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

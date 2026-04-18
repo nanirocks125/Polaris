@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:polaris/enum/exam_phase.dart';
+import 'package:polaris/modules/subject/subject_snapshot.dart';
 import 'package:polaris/util/time_stamp_converter.dart';
 
 part 'exam.g.dart';
@@ -14,12 +16,14 @@ class Exam {
   @TimestampConverter()
   DateTime targetDate;
 
-  List<String> phases;
+  @TimestampConverter()
+  DateTime? lastStudiedAt;
 
+  List<ExamPhase> phases;
+  List<SubjectSnapshot> subjects;
+  Map<String, String> resourceLinks;
   bool isActive;
-
   int targetRecallPercentage;
-
   String themeColorHex;
 
   Exam({
@@ -27,10 +31,13 @@ class Exam {
     required this.title,
     this.description = '',
     required this.targetDate,
+    this.lastStudiedAt,
     this.phases = const [],
     this.isActive = false,
     this.targetRecallPercentage = 70, // Default to your 70% goal
     this.themeColorHex = '#2196F3', // Default Flutter Blue
+    this.resourceLinks = const {},
+    this.subjects = const [], // Default to empty list
   });
 
   factory Exam.fromJson(Map<String, dynamic> json) => _$ExamFromJson(json);

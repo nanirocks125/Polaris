@@ -6,7 +6,20 @@ import 'package:polaris/components/scaffold_global_drawer.dart';
 import 'package:polaris/modules/dashboard/dashboard.dart';
 import 'package:polaris/modules/exam/exam.dart';
 import 'package:polaris/modules/exam/exam_details_screen.dart';
+import 'package:polaris/modules/exam/exam_edit_screen.dart';
 import 'package:polaris/modules/exam/exam_management_screen.dart';
+import 'package:polaris/modules/module/module.dart';
+import 'package:polaris/modules/module/module_details_screen.dart';
+import 'package:polaris/modules/module/module_edit_screen.dart';
+import 'package:polaris/modules/module/module_list_screen.dart';
+import 'package:polaris/modules/subject/subject.dart';
+import 'package:polaris/modules/subject/subject_details_screen.dart';
+import 'package:polaris/modules/subject/subject_edit_screen.dart';
+import 'package:polaris/modules/subject/subject_list_screen.dart';
+import 'package:polaris/modules/topic/topic.dart';
+import 'package:polaris/modules/topic/topic_details_screen.dart';
+import 'package:polaris/modules/topic/topic_edit_screen.dart';
+import 'package:polaris/modules/topic/topic_list_screen.dart';
 import 'modules/authentication/login_screen.dart';
 
 // 1. A helper class that tells the router to refresh whenever Firebase Auth changes
@@ -79,6 +92,57 @@ final GoRouter appRouter = GoRouter(
             // Extract the exam object passed during navigation
             final exam = state.extra as Exam;
             return ExamDetailsScreen(exam: exam);
+          },
+        ),
+        GoRoute(
+          path: '/edit-exam',
+          builder: (context, state) {
+            final exam = state.extra as Exam;
+            return ExamEditScreen(exam: exam);
+          },
+        ),
+        GoRoute(
+          path: '/subjects',
+          builder: (context, state) => const SubjectListScreen(),
+        ),
+        GoRoute(
+          path: '/subject-details',
+          builder: (context, state) =>
+              SubjectDetailsScreen(subject: state.extra as Subject),
+        ),
+        GoRoute(
+          path: '/edit-subject',
+          builder: (context, state) =>
+              SubjectEditScreen(subject: state.extra as Subject),
+        ),
+        GoRoute(
+          path: '/modules',
+          builder: (context, state) => const ModuleListScreen(),
+        ),
+        GoRoute(
+          path: '/module-details',
+          builder: (context, state) =>
+              ModuleDetailsScreen(module: state.extra as Module),
+        ),
+        GoRoute(
+          path: '/edit-module',
+          builder: (context, state) =>
+              ModuleEditScreen(module: state.extra as Module),
+        ),
+
+        GoRoute(
+          path: '/topics',
+          builder: (context, state) => const TopicListScreen(),
+        ),
+        GoRoute(
+          path: '/topic-details',
+          builder: (context, state) =>
+              TopicDetailsScreen(topic: state.extra as Topic),
+        ),
+        GoRoute(
+          path: '/edit-topic',
+          builder: (context, state) {
+            return TopicEditScreen(topic: state.extra as Topic);
           },
         ),
       ],

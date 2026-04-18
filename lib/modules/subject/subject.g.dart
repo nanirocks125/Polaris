@@ -7,19 +7,15 @@ part of 'subject.dart';
 // **************************************************************************
 
 Subject _$SubjectFromJson(Map<String, dynamic> json) => Subject(
-  subjectId: json['subjectId'] as String,
   title: json['title'] as String,
-  examPhases: (json['examPhases'] as List<dynamic>)
-      .map((e) => e as String)
-      .toList(),
-  topics: (json['topics'] as List<dynamic>)
-      .map((e) => Topic.fromJson(e as Map<String, dynamic>))
-      .toList(),
+  iconName: json['iconName'] as String?,
+  description: json['description'] as String? ?? '',
+  isGeneralStudies: json['isGeneralStudies'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$SubjectToJson(Subject instance) => <String, dynamic>{
-  'subjectId': instance.subjectId,
   'title': instance.title,
-  'examPhases': instance.examPhases,
-  'topics': instance.topics.map((e) => e.toJson()).toList(),
+  'iconName': instance.iconName,
+  'description': instance.description,
+  'isGeneralStudies': instance.isGeneralStudies,
 };
