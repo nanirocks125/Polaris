@@ -56,6 +56,7 @@ class ExamDetailsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Exam Overview'),
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
@@ -68,105 +69,205 @@ class ExamDetailsScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        // padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeaderSection(context, themeColor, daysRemaining),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  _buildSectionLabel(context, "Performance Goals"),
+                  const SizedBox(height: 12),
+                  _buildStatsSection(context, themeColor),
+
+                  const SizedBox(height: 32),
+                  _buildSectionLabel(context, "Preparation Phases"),
+                  const SizedBox(height: 12),
+                  if (exam.phases.isEmpty)
+                    const Text("No phases defined.")
+                  else
+                    ...exam.phases.map(
+                      (phase) => _buildPhaseCard(context, phase, themeColor),
+                    ),
+
+                  const SizedBox(height: 32),
+                  _buildSectionLabel(context, "Quick Links"),
+                  const SizedBox(height: 12),
+                  _buildResourcesGrid(themeColor),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 1. Big Hero Header for Title and Description
+  Widget _buildHeaderSection(BuildContext context, Color themeColor, int days) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 30),
+      decoration: BoxDecoration(
+        color: Theme.of(context).appBarTheme.backgroundColor,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildStatusHeader(),
+          Text(
+            exam.title,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            exam.description.isEmpty
+                ? "No description provided."
+                : exam.description,
+            style: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 15,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 2. Big Stats Row for Date and Recall
+  Widget _buildStatsSection(BuildContext context, Color themeColor) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildBigStatCard(
+            context,
+            "Target Date",
+            exam.targetDate.toLocal().toString().split(' ')[0],
+            Icons.calendar_today_rounded,
+            themeColor,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildBigStatCard(
+            context,
+            "Recall Goal",
+            "${exam.targetRecallPercentage}%",
+            Icons.insights_rounded,
+            Colors.orangeAccent,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBigStatCard(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 16),
+          Text(label, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 3. Informative Phase Cards
+  Widget _buildPhaseCard(
+    BuildContext context,
+    PhaseDetail detail,
+    Color themeColor,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => context.push(
+          '/manage-papers',
+          extra: {'exam': exam, 'phase': detail},
+        ),
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
             children: [
-              _buildStatusHeader(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      exam.title,
-                      style: Theme.of(context).textTheme.headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  _buildCountdownBadge(daysRemaining, themeColor),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Text(
-                exam.description.isEmpty
-                    ? "No description provided."
-                    : exam.description,
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-              ),
-              const SizedBox(height: 32),
-
-              Row(
-                children: [
-                  _buildInfoTile(
-                    context,
-                    "Target Date",
-                    exam.targetDate.toLocal().toString().split(' ')[0],
-                    Icons.event,
-                    themeColor,
-                  ),
-                  const SizedBox(width: 16),
-                  _buildInfoTile(
-                    context,
-                    "Recall Goal",
-                    "${exam.targetRecallPercentage}%",
-                    Icons.psychology_outlined,
-                    themeColor,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
-
-              _buildInfoTile(
-                context,
-                "Status",
-                exam.isActive ? "ACTIVE" : "INACTIVE",
-                Icons.radio_button_checked,
-                exam.isActive ? Colors.green : Colors.grey,
-              ),
-
-              _buildSectionLabel(context, "Phases & Marks"),
-              const SizedBox(height: 12),
-              if (exam.phases.isEmpty)
-                const Text("No phases defined.")
-              else
-                ...exam.phases.map(
-                  (phase) => _buildPhaseCard(context, phase, themeColor),
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: themeColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-
-              const SizedBox(height: 32),
-
-              _buildSectionLabel(context, "Quick Links & Resources"),
-              const SizedBox(height: 12),
-              ...exam.resourceLinks.entries.map(
-                (entry) => Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: Icon(Icons.link, color: themeColor),
-                    title: Text(entry.key),
-                    subtitle: Text(
-                      entry.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                child: Center(
+                  child: Text(
+                    detail.phase.label[0],
+                    style: TextStyle(
+                      color: themeColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                    trailing: const Icon(Icons.open_in_new, size: 18),
-                    onTap: () {
-                      // url_launcher logic here
-                    },
                   ),
                 ),
               ),
-              if (exam.resourceLinks.isEmpty)
-                const Text("No resources linked."),
-
-              const SizedBox(height: 16),
-              OutlinedButton.icon(
-                onPressed: () => context.push('/manage-subjects', extra: exam),
-                icon: const Icon(Icons.list_alt),
-                label: const Text("Manage Master Subject List"),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      detail.phase.label,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "${detail.papers.length} Papers • ${detail.totalSubjectsCount} Subjects",
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_rounded,
+                size: 16,
+                color: Colors.grey,
               ),
             ],
           ),
@@ -175,8 +276,52 @@ class ExamDetailsScreen extends StatelessWidget {
     );
   }
 
-  // --- New UI Components for Model Updates ---
+  // 4. Compact Resource Grid
+  Widget _buildResourcesGrid(Color themeColor) {
+    if (exam.resourceLinks.isEmpty) return const Text("No resources linked.");
 
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 2.5,
+      ),
+      itemCount: exam.resourceLinks.length,
+      itemBuilder: (context, index) {
+        String key = exam.resourceLinks.keys.elementAt(index);
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.link, size: 18, color: themeColor),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  key,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // --- New UI Components for Model Updates ---
+  /*
   Widget _buildPhaseCard(
     BuildContext context,
     PhaseDetail detail,
@@ -184,66 +329,36 @@ class ExamDetailsScreen extends StatelessWidget {
   ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.antiAlias, // Ensures ink splash follows border radius
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: themeColor.withOpacity(0.2)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            CircleAvatar(
-              backgroundColor: themeColor.withOpacity(0.1),
-              child: Text(
-                detail.phase.label[0],
-                style: TextStyle(
-                  color: themeColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    detail.phase.label,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text(
-                    "${detail.papers.length} Papers • ${detail.totalMarks} Total Marks",
-                    style: const TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
-                ],
-              ),
-            ),
-            if (detail.previousCutoff != null)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text(
-                    "Prev. Cutoff",
-                    style: TextStyle(fontSize: 10, color: Colors.grey),
-                  ),
-                  Text(
-                    detail.previousCutoff.toString(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: themeColor,
-                    ),
-                  ),
-                ],
-              ),
-          ],
+      child: ListTile(
+        // Using ListTile inside Card for easy onTap behavior
+        onTap: () => context.push(
+          '/manage-papers',
+          extra: {'exam': exam, 'phase': detail},
         ),
+        leading: CircleAvatar(
+          backgroundColor: themeColor.withOpacity(0.1),
+          child: Text(
+            detail.phase.label[0],
+            style: TextStyle(color: themeColor, fontWeight: FontWeight.bold),
+          ),
+        ),
+        title: Text(
+          detail.phase.label,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          "${detail.papers.length} Papers • ${detail.totalSubjectsCount} Subjects",
+        ),
+        trailing: const Icon(Icons.chevron_right, size: 20),
       ),
     );
   }
-
+*/
   Widget _buildStatusHeader() {
     final bool active = exam.isActive;
     return Container(
@@ -291,56 +406,6 @@ class ExamDetailsScreen extends StatelessWidget {
         fontWeight: FontWeight.bold,
         letterSpacing: 1.2,
         color: Colors.grey,
-      ),
-    );
-  }
-
-  Widget _buildCountdownBadge(int days, Color color) {
-    bool isPast = days < 0;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isPast ? Colors.red.withOpacity(0.1) : color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: isPast ? Colors.red : color),
-      ),
-      child: Text(
-        isPast ? "COMPLETED" : "$days DAYS LEFT",
-        style: TextStyle(
-          color: isPast ? Colors.red : color,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoTile(
-    BuildContext context,
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.withOpacity(0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(height: 12),
-          Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ],
       ),
     );
   }

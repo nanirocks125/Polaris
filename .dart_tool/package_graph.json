@@ -15,7 +15,8 @@
         "go_router",
         "intl",
         "json_annotation",
-        "provider"
+        "provider",
+        "uuid"
       ],
       "devDependencies": [
         "build_runner",
@@ -102,6 +103,14 @@
         "stream_channel",
         "test_api",
         "vector_math"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "4.5.3",
+      "dependencies": [
+        "crypto",
+        "fixnum"
       ]
     },
     {
@@ -561,6 +570,11 @@
       ]
     },
     {
+      "name": "fixnum",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
       "name": "nested",
       "version": "1.0.0",
       "dependencies": [
@@ -734,11 +748,6 @@
       "dependencies": [
         "collection"
       ]
-    },
-    {
-      "name": "fixnum",
-      "version": "1.1.1",
-      "dependencies": []
     },
     {
       "name": "leak_tracker_testing",

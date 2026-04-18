@@ -22,7 +22,7 @@ Map<String, dynamic> _$PhaseDetailToJson(PhaseDetail instance) =>
       'phase': _$ExamPhaseEnumMap[instance.phase]!,
       'totalMarks': instance.totalMarks,
       'previousCutoff': instance.previousCutoff,
-      'papers': instance.papers,
+      'papers': instance.papers.map((e) => e.toJson()).toList(),
     };
 
 const _$ExamPhaseEnumMap = {

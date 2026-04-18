@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:polaris/modules/module/module_snapshot.dart';
-import 'package:polaris/modules/subject/subject_snapshot.dart';
+import 'package:polaris/modules/subject/model/subject_snapshot.dart';
 import 'package:polaris/util/time_stamp_converter.dart';
 
 part 'topic.g.dart';

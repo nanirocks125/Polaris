@@ -10,6 +10,7 @@ import 'package:polaris/modules/exam/exam_edit_screen.dart';
 import 'package:polaris/modules/exam/exam_management_screen.dart';
 import 'package:polaris/modules/exam/paper_management_screen.dart';
 import 'package:polaris/modules/exam/phase_details.dart';
+import 'package:polaris/modules/exam/subject_management_screen.dart';
 import 'package:polaris/modules/module/module.dart';
 import 'package:polaris/modules/module/module_details_screen.dart';
 import 'package:polaris/modules/module/module_edit_screen.dart';
@@ -167,13 +168,13 @@ final GoRouter appRouter = GoRouter(
             return TopicEditScreen(topic: state.extra as Topic);
           },
         ),
-        GoRoute(
-          path: '/manage-subjects',
-          builder: (context, state) {
-            final exam = state.extra as Exam;
-            return SubjectListScreen();
-          },
-        ),
+        // GoRoute(
+        //   path: '/manage-subjects',
+        //   builder: (context, state) {
+        //     final exam = state.extra as Exam;
+        //     return SubjectManagementScreen(exam: exam);
+        //   },
+        // ),
         GoRoute(
           path: '/manage-papers',
           builder: (context, state) {

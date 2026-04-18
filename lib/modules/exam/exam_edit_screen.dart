@@ -67,7 +67,6 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
       isActive: widget.exam.isActive,
       targetRecallPercentage: widget.exam.targetRecallPercentage,
       themeColorHex: widget.exam.themeColorHex,
-      subjects: widget.exam.subjects, // Preserve subjects
       lastStudiedAt: widget.exam.lastStudiedAt,
     );
 

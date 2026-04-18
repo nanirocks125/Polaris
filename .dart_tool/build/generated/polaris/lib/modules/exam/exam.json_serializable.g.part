@@ -27,11 +27,6 @@ Exam _$ExamFromJson(Map<String, dynamic> json) => Exam(
         (k, e) => MapEntry(k, e as String),
       ) ??
       const {},
-  subjects:
-      (json['subjects'] as List<dynamic>?)
-          ?.map((e) => SubjectSnapshot.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
 );
 
 Map<String, dynamic> _$ExamToJson(Exam instance) => <String, dynamic>{
@@ -44,7 +39,6 @@ Map<String, dynamic> _$ExamToJson(Exam instance) => <String, dynamic>{
     const TimestampConverter().toJson,
   ),
   'phases': instance.phases.map((e) => e.toJson()).toList(),
-  'subjects': instance.subjects.map((e) => e.toJson()).toList(),
   'resourceLinks': instance.resourceLinks,
   'isActive': instance.isActive,
   'targetRecallPercentage': instance.targetRecallPercentage,
