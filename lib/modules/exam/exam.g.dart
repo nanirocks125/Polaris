@@ -19,7 +19,7 @@ Exam _$ExamFromJson(Map<String, dynamic> json) => Exam(
   ),
   phases:
       (json['phases'] as List<dynamic>?)
-          ?.map((e) => $enumDecode(_$ExamPhaseEnumMap, e))
+          ?.map((e) => PhaseDetail.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
   isActive: json['isActive'] as bool? ?? false,
@@ -47,8 +47,8 @@ Map<String, dynamic> _$ExamToJson(Exam instance) => <String, dynamic>{
     instance.lastStudiedAt,
     const TimestampConverter().toJson,
   ),
-  'phases': instance.phases.map((e) => _$ExamPhaseEnumMap[e]!).toList(),
-  'subjects': instance.subjects,
+  'phases': instance.phases.map((e) => e.toJson()).toList(),
+  'subjects': instance.subjects.map((e) => e.toJson()).toList(),
   'resourceLinks': instance.resourceLinks,
   'isActive': instance.isActive,
   'targetRecallPercentage': instance.targetRecallPercentage,
@@ -59,12 +59,6 @@ Value? _$JsonConverterFromJson<Json, Value>(
   Object? json,
   Value? Function(Json json) fromJson,
 ) => json == null ? null : fromJson(json as Json);
-
-const _$ExamPhaseEnumMap = {
-  ExamPhase.prelims: 'prelims',
-  ExamPhase.mains: 'mains',
-  ExamPhase.interview: 'interview',
-};
 
 Json? _$JsonConverterToJson<Json, Value>(
   Value? value,

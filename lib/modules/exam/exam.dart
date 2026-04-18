@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:polaris/enum/exam_phase.dart';
+import 'package:polaris/modules/exam/phase_details.dart';
 import 'package:polaris/modules/subject/subject_snapshot.dart';
 import 'package:polaris/util/time_stamp_converter.dart';
 
 part 'exam.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class Exam {
   String id;
 
@@ -19,7 +20,7 @@ class Exam {
   @TimestampConverter()
   DateTime? lastStudiedAt;
 
-  List<ExamPhase> phases;
+  List<PhaseDetail> phases;
   List<SubjectSnapshot> subjects;
   Map<String, String> resourceLinks;
   bool isActive;

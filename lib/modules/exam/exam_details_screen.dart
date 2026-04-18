@@ -127,22 +127,22 @@ class ExamDetailsScreen extends StatelessWidget {
 
             // Phases Section
             _buildSectionLabel(context, "Phases"),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: exam.phases
-                  .map(
-                    (phase) => Chip(
-                      label: Text(phase.label),
-                      backgroundColor: themeColor.withOpacity(0.1),
-                      side: BorderSide(color: themeColor.withOpacity(0.5)),
-                    ),
-                  )
-                  .toList(),
-            ),
-            if (exam.phases.isEmpty) const Text("No phases defined."),
 
+            // const SizedBox(height: 12),
+            // Wrap(
+            //   spacing: 8,
+            //   runSpacing: 8,
+            //   children: exam.phases
+            //       .map(
+            //         (phase) => Chip(
+            //           label: Text(phase.label),
+            //           backgroundColor: themeColor.withOpacity(0.1),
+            //           side: BorderSide(color: themeColor.withOpacity(0.5)),
+            //         ),
+            //       )
+            //       .toList(),
+            // ),
+            // if (exam.phases.isEmpty) const Text("No phases defined."),
             const SizedBox(height: 32),
 
             // Resources Section

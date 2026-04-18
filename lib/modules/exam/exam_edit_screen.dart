@@ -39,7 +39,7 @@ class _ExamEditScreenState extends State<ExamEditScreen> {
       title: _titleController.text.trim(),
       description: _descController.text.trim(),
       targetDate: _selectedDate,
-      phases: _phases,
+      phases: [],
       resourceLinks: _resourceLinks,
       isActive: widget.exam.isActive,
       targetRecallPercentage: widget.exam.targetRecallPercentage,
