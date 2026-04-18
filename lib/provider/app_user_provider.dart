@@ -11,7 +11,6 @@ class AppUserProvider extends ChangeNotifier {
 
   AppUser? get user => _user;
   bool get isAuthenticated => _user != null;
-  bool get isAdmin => _user?.isAdmin ?? false;
 
   AppUserProvider() {
     // 1. Listen to Firebase Auth state changes

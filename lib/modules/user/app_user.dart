@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:polaris/modules/exam/exam_snapshot.dart';
 import 'package:polaris/modules/user/app_user_role.dart';
 import 'package:polaris/modules/user/app_user_settings.dart';
 
@@ -14,8 +15,8 @@ class AppUser {
   AppUserRole role;
 
   // The Switchboard
-  String? activeExamId;
-  List<String> assignedExams;
+  ExamSnapshot? activeExam;
+  List<ExamSnapshot> assignedExams;
 
   // Nested Settings for cleaner state management
   AppUserSettings settings;
@@ -24,7 +25,7 @@ class AppUser {
     this.id = '',
     this.name,
     this.email,
-    this.activeExamId,
+    this.activeExam,
     this.assignedExams = const [],
     this.role = .user,
     AppUserSettings? settings,
