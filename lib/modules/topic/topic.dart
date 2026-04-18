@@ -17,6 +17,8 @@ class Topic {
   int easeFactor; // Usually starts at 2.5
   int interval; // Days until next review
   bool isCompleted; // Added for progress tracking
+  int repetitions;
+  bool isHighYield;
 
   SubjectSnapshot? subject;
   ModuleSnapshot? module;
@@ -27,16 +29,21 @@ class Topic {
   @TimestampConverter()
   DateTime? nextReviewDate;
 
+  List<String> resourceLinks;
+
   Topic({
     this.id = '',
     required this.title,
     this.description = '',
     this.isCompleted = false, // Initialize as false
     this.easeFactor = 250, // Stored as int (2.5 * 100)
+    this.isHighYield = false,
     this.interval = 0,
+    this.repetitions = 0,
     this.lastReviewedAt,
     this.nextReviewDate,
     this.subject,
+    this.resourceLinks = const [],
     this.module,
   });
 
@@ -45,7 +52,7 @@ class Topic {
 
   factory Topic.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data();
-    if (data == null) throw Exception("Subject data null");
+    if (data == null) throw Exception("Topic data null");
     final topic = Topic.fromJson(data);
     topic.id = doc.id;
     return topic;
