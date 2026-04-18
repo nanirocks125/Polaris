@@ -23,41 +23,49 @@ class SubjectDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              subject.title,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Chip(
-              label: Text(
-                subject.isGeneralStudies ? 'General Studies' : 'Optional',
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                subject.title,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              backgroundColor: Colors.blueGrey.withOpacity(0.2),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'DESCRIPTION',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
+              const SizedBox(height: 8),
+              Chip(
+                label: Text(
+                  subject.isGeneralStudies ? 'General Studies' : 'Optional',
+                ),
+                backgroundColor: Colors.blueGrey.withOpacity(0.2),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              subject.description.isEmpty
-                  ? 'No description provided.'
-                  : subject.description,
-              style: const TextStyle(fontSize: 16, height: 1.5),
-            ),
-          ],
+              const SizedBox(height: 24),
+              const Text(
+                'DESCRIPTION',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                subject.description.isEmpty
+                    ? 'No description provided.'
+                    : subject.description,
+                style: const TextStyle(fontSize: 16, height: 1.5),
+              ),
+              const SizedBox(height: 40),
+
+              // --- THE NEW MODULE LIST CALL ---
+              _buildModuleList(),
+
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -89,6 +97,49 @@ class SubjectDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // Inside SubjectDetailsScreen build method
+  Widget _buildModuleList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "CURRICULUM MODULES",
+          style: TextStyle(
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...subject.modules.map(
+          (module) => Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              leading: const CircleAvatar(child: Icon(Icons.folder_open)),
+              title: Text(
+                module.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text("Tap to view topics"),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                // Navigate to Module Details
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

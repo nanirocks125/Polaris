@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:polaris/modules/module/module.dart';
 import 'package:polaris/modules/subject/model/subject.dart';
 
 class SubjectService {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final CollectionReference<Map<String, dynamic>> _subjectsRef =
       FirebaseFirestore.instance.collection('subjects');
+  final CollectionReference<Map<String, dynamic>> _modulesRef =
+      FirebaseFirestore.instance.collection('modules');
 
   Stream<List<Subject>> getSubjectsStream() {
     return _subjectsRef
@@ -28,5 +32,45 @@ class SubjectService {
 
   Future<void> deleteSubject(String id) async {
     await _subjectsRef.doc(id).delete();
+  }
+
+  Future<void> linkModuleToSubject(Subject subject, Module module) async {
+    final subjectDoc = _subjectsRef.doc(subject.id);
+    final moduleDoc = _modulesRef.doc(module.id);
+
+    return _db.runTransaction((transaction) async {
+      // 1. Update Subject: Add ModuleSnapshot to the list
+      transaction.update(subjectDoc, {
+        'modules': FieldValue.arrayUnion([module.snapshot.toJson()]),
+        'modulesCount': FieldValue.increment(1),
+      });
+
+      // 2. Update Module: Set the SubjectSnapshot
+      transaction.update(moduleDoc, {'subject': subject.snapshot.toJson()});
+    });
+  }
+
+  /// Atomically creates a NEW module and links it to the Subject
+  Future<void> createAndLinkModule(Subject subject, String moduleTitle) async {
+    final subjectDoc = _subjectsRef.doc(subject.id);
+    final newModuleDoc = _modulesRef.doc(); // Auto-gen ID
+
+    final newModule = Module(
+      id: newModuleDoc.id,
+      title: moduleTitle,
+      description: "Auto-generated for ${subject.title}",
+      subject: subject.snapshot,
+    );
+
+    return _db.runTransaction((transaction) async {
+      // 1. Create the Module document
+      transaction.set(newModuleDoc, newModule.toJson());
+
+      // 2. Update the Subject list
+      transaction.update(subjectDoc, {
+        'modules': FieldValue.arrayUnion([newModule.snapshot.toJson()]),
+        'modulesCount': FieldValue.increment(1),
+      });
+    });
   }
 }

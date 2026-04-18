@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:polaris/modules/module/module_snapshot.dart';
 import 'package:polaris/modules/subject/model/subject_snapshot.dart';
 import 'package:polaris/modules/topic/topic_snapshot.dart';
 
@@ -39,5 +40,11 @@ class Module {
     final module = Module.fromJson(data);
     module.id = doc.id;
     return module;
+  }
+}
+
+extension ModuleExtension on Module {
+  ModuleSnapshot get snapshot {
+    return ModuleSnapshot(id: id, title: title);
   }
 }
